@@ -1,0 +1,1 @@
+# FiveM Cervical Collar script
