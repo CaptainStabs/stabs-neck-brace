@@ -53,8 +53,8 @@ AddEventHandler("playerDropped", function(reason)
 end)
 
 
-QBCore.Commands.Add("logout1", nil, {}, false, function(source)
-    local src = source
-    QBCore.Player.Logout(src)
-    TriggerClientEvent('qb-multicharacter:client:chooseChar', src)
-end)
+-- QBCore.Commands.Add("logout1", nil, {}, false, function(source)
+--     local src = source
+--     QBCore.Player.Logout(src)
+--     TriggerClientEvent('qb-multicharacter:client:chooseChar', src)
+-- end)
