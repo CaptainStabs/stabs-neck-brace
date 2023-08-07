@@ -18,10 +18,8 @@ local function attachCollar()
         local playerServerId = GetPlayerServerId(closestPlayer)
 
         QBCore.Functions.TriggerCallback('neckBrace:server:CheckCollarAttached', function(collarModel)
-            print('collarattached', collarModel)
             if DoesEntityExist(playerPed) and not DoesEntityExist(collar) and collarModel == nil then
                 local neckBone = GetPedBoneIndex(playerPed, 39317)
-                print('attaching')
                 collar = CreateObject(objectHash, 0.0, 0.0, 0.0, true, true, true)
 
                 local collarNetId = NetworkGetNetworkIdFromEntity(collar)
@@ -54,7 +52,6 @@ function detachCollar()
     local closestPlayer = GetClosestPlayer()
     local playerServerId = GetPlayerServerId(closestPlayer)
     QBCore.Functions.TriggerCallback('neckBrace:server:CheckCollarAttached', function(serverCollarModel)
-        print('detach collar', serverCollarModel)
         if serverCollarModel ~= nil then
             local playerPed = GetPlayerPed(closestPlayer)
             local collarEntity = NetToEnt(serverCollarModel)
@@ -63,7 +60,7 @@ function detachCollar()
             SetPedCanHeadIk(playerPed, true)
 
     else
-        print("NOTHING TO DELETE")
+        print("Nothing to delete")
     end
 
     end, playerServerId)

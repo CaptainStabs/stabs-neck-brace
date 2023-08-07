@@ -16,12 +16,8 @@ end
 
 QBCore.Functions.CreateCallback('neckBrace:server:CheckCollarAttached', function(_, cb, targetPlayer)
     local targetPlayer = tostring(targetPlayer)
-    print("CheckCollarAttached", dump(collars))
-    print('this should be collars number', collars[targetPlayer])
-    print('targetPlayer', targetPlayer)
     if collars[targetPlayer] ~= nil then
         collarModel = collars[targetPlayer]
-        print('attached, model', collarModel)
 
     else 
         collarModel = nil
@@ -33,7 +29,6 @@ RegisterServerEvent("AttachCollarToPlayer")
 AddEventHandler("AttachCollarToPlayer", function(targetPlayer, collar)
     local targetPlayer = tostring(targetPlayer)
     collars[targetPlayer] = collar
-    print("ATTACHCollar", dump(collars))
 end)
 
 RegisterServerEvent("RemoveCollarFromPlayer")
@@ -42,5 +37,4 @@ AddEventHandler("RemoveCollarFromPlayer", function(targetPlayer)
     local collar = NetworkGetEntityFromNetworkId(collars[targetPlayer])
     DeleteEntity(collar)
     collars[targetPlayer] = nil
-    print("after removal", collars[targetPlayer])
 end)
