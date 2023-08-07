@@ -11,3 +11,9 @@ client_scripts {
     'client/client.lua',
     'client/target.lua'
 }
+
+dependencies {
+    'qb-core',
+    'qb-ambulancejob',
+    'qb-target'
+}
