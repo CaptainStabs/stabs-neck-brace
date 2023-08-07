@@ -3,7 +3,7 @@ collar = nil
 local objectHash = GetHashKey('cervical_collar')
 
 local function AttachCollarToPlayer(targetPlayer, collar)
-    TriggerServerEvent("AttachCollarToPlayer", targetPlayer, NetworkGetNetworkIdFromEntity(collar))
+    TriggerServerEvent("AttachCollarToPlayer", targetPlayer, collar)
 end
 
 local function RemoveCollarFromPlayer(targetPlayer)
@@ -96,6 +96,18 @@ local function LoadModel(modelHash)
     end
 end
 
+local function removeOldCollar(source)
+    local playerId = source
+    local playerServerId = GetPlayerServerId(playerId)
+
+    -- Check if the player has a collar attached
+    QBCore.Functions.TriggerCallback('neckBrace:server:CheckCollarAttached', function(collarModel)
+        if collarModel then
+            RemoveCollarFromPlayer(playerServerId, collarModel)
+        end
+    end, playerServerId)
+end
+
 RegisterNetEvent("collar:detachCollar")
 AddEventHandler("collar:detachCollar", function()
     detachCollar()
@@ -104,6 +116,10 @@ end)
 RegisterNetEvent("collar:attachCollar")
 AddEventHandler("collar:attachCollar", function()
     attachCollar()
+end)
+
+RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
+    removeOldCollar(source)
 end)
 
 -- Debugging commands

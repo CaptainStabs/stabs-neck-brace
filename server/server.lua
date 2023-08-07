@@ -38,3 +38,23 @@ AddEventHandler("RemoveCollarFromPlayer", function(targetPlayer)
     DeleteEntity(collar)
     collars[targetPlayer] = nil
 end)
+
+AddEventHandler("playerDropped", function(reason)
+    local playerId = source
+    local playerServerId = tostring(playerId)
+    print('serverIEDD', playerServerId)
+    if collars[playerServerId] ~= nil then
+        local collar = NetworkGetEntityFromNetworkId(collars[playerServerId])
+        if DoesEntityExist(collar) then
+            DeleteEntity(collar)
+        end
+        collars[playerServerId] = nil
+    end
+end)
+
+
+QBCore.Commands.Add("logout1", nil, {}, false, function(source)
+    local src = source
+    QBCore.Player.Logout(src)
+    TriggerClientEvent('qb-multicharacter:client:chooseChar', src)
+end)
