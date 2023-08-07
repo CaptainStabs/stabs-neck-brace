@@ -8,6 +8,6 @@ server_script 'server/server.lua'
 shared_script 'config.lua'
 
 client_scripts {
-    'client/target.lua',
-    'client/client.lua'
+    'client/client.lua',
+    'client/target.lua'
 }

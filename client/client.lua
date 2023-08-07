@@ -10,7 +10,7 @@ local function RemoveCollarFromPlayer(targetPlayer)
     TriggerServerEvent("RemoveCollarFromPlayer", targetPlayer)
 end
 
-local function AttachCollar()
+local function attachCollar()
     local closestPlayer = GetClosestPlayer()
     if closestPlayer ~= nil then
         playerPed = GetPlayerPed(closestPlayer)
@@ -21,7 +21,7 @@ local function AttachCollar()
             print('collarattached', collarModel)
             if DoesEntityExist(playerPed) and not DoesEntityExist(collar) and collarModel == nil then
                 local neckBone = GetPedBoneIndex(playerPed, 39317)
-                
+                print('attaching')
                 collar = CreateObject(objectHash, 0.0, 0.0, 0.0, true, true, true)
 
                 local collarNetId = NetworkGetNetworkIdFromEntity(collar)
@@ -29,13 +29,17 @@ local function AttachCollar()
                 NetworkRegisterEntityAsNetworked(collar)
                 SetNetworkIdCanMigrate(collarNetId, true)
                 SetNetworkIdExistsOnAllMachines(collarNetId, true)
-                
-                AttachCollarToPlayer(playerServerId, collar)
+                SetEntityAsMissionEntity(collar)
+
+                -- send serverId to be saved on server side
+                AttachCollarToPlayer(playerServerId, collarNetId)
+
                 AttachEntityToEntity(collar, playerPed, neckBone, 0.03, 0.01, 0, -25.0, 90.0, 180.0, true, true, false, true, 1, true)
+                SetPedCanHeadIk(playerPed, false)
                 
                 Citizen.CreateThread(function()
-                    while collar ~= nil do
-                        SetPedCanHeadIk(playerPed, false)
+                    while DoesEntityExist(collar) do
+                        SetPedCanHeadIk(playerPed, false) -- Only visible to other people
                         Citizen.Wait(0)
                     end
                 end)
@@ -54,15 +58,6 @@ function detachCollar()
         if serverCollarModel ~= nil then
             local playerPed = GetPlayerPed(closestPlayer)
             local collarEntity = NetToEnt(serverCollarModel)
-            DetachEntity(collarEntity)
-            SetEntityAsMissionEntity(collarEntity)
-            NetworkRequestControlOfEntity(collarEntity)
-            print('contrl', NetworkRequestControlOfEntity(collarEntity))
-            print('inside callback', playerServerId)
-            print('collar', collarEntity)
-            DeleteEntity(collarEntity)
-            ClearAllPedProps(playerPed)            
-
             collar = nil
             RemoveCollarFromPlayer(playerServerId, serverCollarModel)
             SetPedCanHeadIk(playerPed, true)
@@ -104,28 +99,38 @@ local function LoadModel(modelHash)
     end
 end
 
+RegisterNetEvent("collar:detachCollar")
+AddEventHandler("collar:detachCollar", function()
+    detachCollar()
+end)
 
+RegisterNetEvent("collar:attachCollar")
+AddEventHandler("collar:attachCollar", function()
+    attachCollar()
+end)
+
+-- Debugging commands
 RegisterCommand("removeCollar", function()
     detachCollar()
 end, false)
 
 
-RegisterCommand("applyCollar", function()
-    AttachCollar()
-end, false)
+-- RegisterCommand("applyCollar", function()
+--     AttachCollar()
+-- end, false)
 
-RegisterCommand("checkCollar", function()
-    local closestPlayer = GetClosestPlayer()
-    if closestPlayer ~= nil then
-        playerPed = GetPlayerPed(closestPlayer)
+-- RegisterCommand("checkCollar", function()
+--     local closestPlayer = GetClosestPlayer()
+--     if closestPlayer ~= nil then
+--         playerPed = GetPlayerPed(closestPlayer)
         
-        local playerServerId = GetPlayerServerId(closestPlayer)
+--         local playerServerId = GetPlayerServerId(closestPlayer)
 
-        QBCore.Functions.TriggerCallback('neckBrace:server:CheckCollarAttached', function(collarModel)
-            print('collarattached', collarModel)
-        end, playerServerId)
-    end
-end)
+--         QBCore.Functions.TriggerCallback('neckBrace:server:CheckCollarAttached', function(collarModel)
+--             print('collarattached', collarModel)
+--         end, playerServerId)
+--     end
+-- end)
 
 Citizen.CreateThread(function()
     LoadModel(objectHash)
